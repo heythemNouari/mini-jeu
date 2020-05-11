@@ -8,16 +8,14 @@ import qualified Keyboard as K
 
 
 
-data GameState = GameState { persoX :: Int
-                           , persoY :: Int
-                           , speed :: Int
-                           , tresorX :: Int 
-                           , tresorY :: Int }
-  deriving (Show)
+data Modele = Cont {carte :: Carte , -- carte actuelle
+                    envi :: Envi , -- environnement actuel
+                    gene :: StdGen , -- generateur aleatoire
+                    log :: String , -- journal d
+                    keyboard :: Keyboard , -- l’etat du clavier
+                    } 
+bouge :: Modele -> Entite -> Coord -> Modele
 
-
-initGameState :: GameState
-initGameState = GameState 100 100 5 400 300 
 
 moveLeft :: GameState -> GameState
 moveLeft gs@(GameState px _ sp _ _) | px > 0 = gs { persoX = px - sp }

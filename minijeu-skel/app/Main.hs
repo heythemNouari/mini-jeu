@@ -106,7 +106,7 @@ gameLoop frameRate renderer tmap smap kbd gameState = do
      else  do
             
             --- display background
-            --S.displaySprite renderer tmap (SM.fetchSprite (SpriteId "background") smap)
+            S.displaySprite renderer tmap (SM.fetchSprite (SpriteId "background") smap)
             --- display perso 
             S.displaySprite renderer tmap (S.moveTo (SM.fetchSprite (SpriteId "perso") smap)
                                           (fromIntegral (M.persoX gameState))
