@@ -13,7 +13,7 @@ data Envi = Envi { contenu_envi :: M.Map Coord [ Entite ]}
 
 
 franchissable_env :: Coord -> Envi -> Bool
-franchissable_env coord env = if (env.contenu_envi ! == Monstre _ ) then false 
+franchissable_env coord (env cnt) = if (contenu M.! coord ) == Monstre x ) then false 
                                                                     else true
 
 
