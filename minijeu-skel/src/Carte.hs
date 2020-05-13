@@ -6,11 +6,11 @@ import qualified Data.Map.Strict as M
 
 import Text.Read
 
-import qualified Data.Matrix as MT 
 
- data PDirection = NS | EO deriving Eq -- direction d’une porte
 
- data StatutP = Ouverte | Fermee deriving Eq -- statut d’une porte
+data PDirection = NS | EO deriving Eq -- direction d’une porte
+
+data StatutP = Ouverte | Fermee deriving Eq -- statut d’une porte
 
 data Case = Normal -- une case vide
         | Porte  PDirection StatutP -- une porte ouverte ou fermee
@@ -35,15 +35,13 @@ data Carte = Carte { cartel :: Int ,
 -- ######## SHow ######il manque que d'ecrire ce qu'on a la fin dans un fichier text 
 instance Show Case where
     show c = case c of 
-                        Normal  -> "N"
-                        Porte Fermee NS   -> "|"
-                        Porte Fermee EO   -> "-"
+                        Carte.Normal  -> "N"
+                        Porte  NS  Fermee -> "|"
+                        Porte  EO  Fermee -> "-"
                         Mur     -> "M"
                         Entree  -> "E"
                         Sortie  -> "S" 
 
-toList ::M.Map Coord Case -> [Case]
-toList map = M.foldrWithKey (\_ a b -> a:b ) [] map
 
 
 instance Show Carte where
@@ -52,11 +50,10 @@ instance Show Carte where
      
 
 addLines :: Int -> String -> String
-addLines 0 s = if (S.strNull s ) then "" 
-				  else let str = (head s : []) ++ "\n"
-					in str ++ (addLines 6 (tail s)) 
-addLines n s = if (S.strNull s ) then "" 
-				  else (head s : []) ++ (addLines (n - 1) (tail s))
+addLines _ [] = ""
+addLines 0 s = let str = (head s : []) ++ "\n"
+					          in str ++ (addLines 6 (tail s)) 
+addLines n s =  (head s : []) ++ (addLines (n - 1) (tail s))
 
 -- on peut la mettre aussi dans le main 
 writeCarteInFile :: Carte -> FilePath-> IO ()
@@ -67,42 +64,20 @@ writeCarteInFile  c@(Carte l h m) fp = do
       -- Read 
 -- ######################################################
 
-readCase :: Char -> Case
-readCase '|' = (Porte EO Fermee) 
-readCase '-' = (Porte NS Fermee) 
-readCase 'X' = Mur 
-readCase 'E' = Entree
-readCase 'S' = Sortie   
-
-readCase  _  = Carte.Normal 
-
-
-instance Read Case where
-  readsPrec _ s = [((readCase (head(toListFromString s))),"")] 
-
-
-
- 
-readsPrec ::(Read a )=> Int -> String -> [(a,String)]
-readsPrec _ c = [((readCase c),"")] 
-
-
-instance Read Carte where 
-  
 
 -- ################ fin read a faire ########## 
 
 
 initCarte :: Carte
-initCarte = Carte 5 9 initLaby
+initCarte = Carte 7 9 initLaby
 
 initLaby :: M.Map Coord Case
-initLaby = M.fromList [((C 0 0),Mur),((C 0 1),Mur ),((C 0 2),Entree),((C 0 3),Normal),((C 0 4),Mur),
-		                    ((C 1 0),Mur) , ((C 1 1),Mur),((C 1 2),Mur),((C 1 3),Sortie),((C 1 4),Mur),
-                        ((C 1 0),Mur) , ((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur),
-                        ((C 1 0),Mur) , ((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur),
-                        ((C 1 0),Mur) , ((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur),
-                        ((C 1 0),Mur) , ((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur),
-                        ((C 1 0),Mur) , ((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur),
-                        ((C 1 0),Mur) , ((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur),
-                        ((C 1 0),Mur) , ((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur) ,((C 1 0),Mur)]
+initLaby = M.fromList [ ((C 0 0),Mur),((C 0 1),Mur ),((C 0 2),Mur),((C 0 3),Mur),((C 0 4),Mur),((C 0 5),Mur),((C 0 6),Mur),
+		                    ((C 1 0),Mur) , ((C 1 1),Mur),((C 1 2),Mur),((C 1 3),Mur),((C 1 4),Mur),((C 1 5),Carte.Normal),((C 1 6),Sortie),
+                        ((C 2 0),Mur) , ((C 2 1),Mur) ,((C 2 2),Mur) ,((C 2 3),Mur) ,((C 2 4),Carte.Normal),((C 2 5),Carte.Normal),((C 2 6),Mur),
+                        ((C 3 0),Mur) , ((C 3 1),Mur) ,((C 3 2),Mur) ,((C 3 3),Mur) ,((C 3 4),Carte.Normal),((C 3 5),Mur),((C 3 6),Mur),
+                        ((C 4 0),Mur) , ((C 4 1),Porte NS Fermee) ,((C 4 2),Mur) ,((C 4 3),Carte.Normal) ,((C 4 4),Carte.Normal),((C 4 5),Mur),((C 4 6),Mur),
+                        ((C 5 0),Mur) , ((C 5 1),Carte.Normal) ,((C 5 2),Mur) ,((C 5 3),Carte.Normal) ,((C 5 4),Mur),((C 5 5),Mur),((C 5 6),Mur),
+                        ((C 6 0),Mur) , ((C 6 1),Carte.Normal) ,((C 6 2),Mur) ,((C 6 3),Carte.Normal) ,((C 6 4),Mur),((C 6 5),Mur),((C 6 6),Mur),
+                        ((C 7 0),Mur) , ((C 7 1),Carte.Normal) ,((C 7 2),Carte.Normal) ,((C 7 3),Carte.Normal) ,((C 7 4),Mur),((C 7 5),Mur),((C 7 6),Mur),
+                        ((C 8 0),Mur) , ((C 8 1),Entree) ,((C 8 2),Mur) ,((C 8 3),Mur) ,((C 8 4),Mur),((C 8 5),Mur),((C 8 6),Mur)]
